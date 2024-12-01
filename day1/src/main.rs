@@ -4,12 +4,16 @@ use anyhow::Result;
 use csv::{ReaderBuilder, StringRecord};
 
 fn main() {
-    day1_solve("./data/test_data.csv");
-    day1_solve("./data/training_data.csv");
-    day1_solve("./data/data.csv");
+    day1_part1_solve("./data/test_data.csv");
+    day1_part1_solve("./data/training_data.csv");
+    day1_part1_solve("./data/data.csv");
+
+    day1_part2_solve("./data/test_data.csv");
+    day1_part2_solve("./data/training_data.csv");
+    day1_part2_solve("./data/data.csv");
 }
 
-pub fn day1_solve(file_path: &str,){
+pub fn day1_part1_solve(file_path: &str,){
     let has_headers = false;
     let delimiter = b',';
 
@@ -27,7 +31,28 @@ pub fn day1_solve(file_path: &str,){
     let vector2 = sort_vector(vectors.1);
     let result = sum_vector(element_wise_distance(vector1, vector2));
 
-    println!("The result for file: {} is : {}", file_path, result);
+    println!("The result for part1 file: {} is : {}", file_path, result);
+}
+
+pub fn day1_part2_solve(file_path: &str,){
+    let has_headers = false;
+    let delimiter = b',';
+
+    let vectors = match read_location_id_file(file_path, has_headers, delimiter) {
+        Ok(rows) => {
+            // println!("\nTotal rows: {}", &rows.len());
+            // println!("Done!");
+            get_vectors(rows)
+        }
+        Err(e) => panic!(),
+    };
+
+
+    let vector1 = sort_vector(vectors.0);
+    let vector2 = sort_vector(vectors.1);
+    let result = similarity_score(vector1, &vector2);
+
+    println!("The result for part2 file: {} is : {}", file_path, result);
 }
 
 pub fn read_location_id_file(file_name: &str, has_headers: bool, delimiter: u8) -> Result<Vec<StringRecord>> {
@@ -65,17 +90,36 @@ pub fn element_wise_distance(vec1: Vec<i32>, vec2: Vec<i32>,) -> Vec<i32> {
     vec1.iter().zip(vec2.iter()).map(|(&b, &v)| (b - v).abs()).collect()
 }
 
+pub fn similarity_score(vec1: Vec<i32>, vec2: &Vec<i32>,) -> i32 {
+    vec1.iter().map(|b| b* occurences_in_vector(b, &vec2)).sum()
+}
+
 pub fn sum_vector(vec: Vec<i32>) -> i32 {
     vec.iter().sum()
 }
 
-pub fn occurences_in_vector(value: &i32, vector: Vec<i32>,) -> usize {
-    vector.iter().filter(|(&b)| b==value ).count()
+pub fn occurences_in_vector(value: &i32, vector: &Vec<i32>,) -> i32 {
+    vector.iter().filter(|(&b)| b==value ).count() as i32
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn similarity_score_should_return_the_similarity_of_two_vectors() {
+        // Given
+        let vector1 =  vec![1,2,3,3,3,4];
+        let vector2 =  vec![3,3,3,4,5,9];
+
+        let expected_result = 31;
+
+        // When
+        let result = similarity_score(vector1, &vector2);
+
+        // Then
+        assert_eq!(result, expected_result);
+    }
 
     #[test]
     fn occurences_in_vector_should_return_the_amount_of_times_the_value_is_in_the_vector() {
@@ -86,7 +130,7 @@ mod tests {
         let expected_result = 3;
 
         // When
-        let result = occurences_in_vector(&value, vector2);
+        let result = occurences_in_vector(&value, &vector2);
 
         // Then
         assert_eq!(result, expected_result);
