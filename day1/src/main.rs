@@ -69,10 +69,28 @@ pub fn sum_vector(vec: Vec<i32>) -> i32 {
     vec.iter().sum()
 }
 
+pub fn occurences_in_vector(value: &i32, vector: Vec<i32>,) -> usize {
+    vector.iter().filter(|(&b)| b==value ).count()
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn occurences_in_vector_should_return_the_amount_of_times_the_value_is_in_the_vector() {
+        // Given
+        let value =  3;
+        let vector2 =  vec![3,3,3,4,5,9];
+
+        let expected_result = 3;
+
+        // When
+        let result = occurences_in_vector(&value, vector2);
+
+        // Then
+        assert_eq!(result, expected_result);
+    }
 
     #[test]
     fn short_list_should_order_a_list_of_location_id_in_ascending_order(){
