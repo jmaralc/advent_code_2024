@@ -6,7 +6,7 @@ fn main() {
 pub fn is_decreasing(mut level: Vec<i32>) -> bool{
     level.iter()
         .zip(level.iter().skip(1))
-        .all(|(a, b)| a>b)
+        .all(|(a, b)| a>b && (b - a).abs()<=3)
 }
 
 #[cfg(test)]
@@ -41,6 +41,18 @@ mod tests {
     fn is_decreasing_level_should_return_false_when_vector_is_not_strictly_decreasing() {
         // Given
         let vector = vec![8,6,4,4,1];
+
+        // When
+        let result = is_decreasing(vector);
+
+        // Then
+        assert_eq!(result, false);
+    }
+
+    #[test]
+    fn is_decreasing_level_should_return_false_when_the_decrease_difference_is_larger_than_three() {
+        // Given
+        let vector = vec![9,7,6,2,1];
 
         // When
         let result = is_decreasing(vector);
