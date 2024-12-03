@@ -1,11 +1,14 @@
-use std::env;
-use std::fs::{read_to_string, File};
-use anyhow::Result;
-use csv::{ReaderBuilder, StringRecord};
+use std::fs::{read_to_string};
+
+
 fn main() {
     println!("DAY 2 --- part 1");
     day2_part1_solve("./data/training_data.csv");
     day2_part1_solve("./data/data.csv");
+
+    println!("DAY 2 --- part 2");
+    day2_part2_solve("./data/training_data.csv");
+    day2_part2_solve("./data/data.csv");
 }
 
 pub fn day2_part1_solve(file_path: &str,){
@@ -14,6 +17,34 @@ pub fn day2_part1_solve(file_path: &str,){
     let count = rows.iter().filter(|&row| is_safe(row.to_vec())).count();
     println!("The result for part1 file: {} is : {}", file_path, count);
 }
+
+pub fn day2_part2_solve(file_path: &str,){
+    let rows = read_lines(file_path);
+
+    let count = rows.iter().filter(|&row| is_safe_with_tolerance(row.to_vec())).count();
+    println!("The result for part1 file: {} is : {}", file_path, count);
+}
+
+pub fn is_safe_with_tolerance(row: Vec<i32>) -> bool {
+
+    if is_safe(row.to_vec()) {
+        return true;
+    }
+
+    let mut counter = 0;
+    for i in 0..row.len() {
+        let temp_report = row.clone();
+        let rep= temp_report.iter().enumerate().filter(|(index, _)| index != &i).map(|(_, &b)| b).collect::<Vec<_>>();
+        let is_safe = is_safe(rep.to_vec());
+        println!("iteration {}, vector: {:?} is safe: {}", i, rep, is_safe);
+         if is_safe {
+             counter +=1;
+         }
+    }
+    if counter >= 1 { return true; }
+    false
+}
+
 pub fn is_safe(row: Vec<i32>) -> bool{
     // println!("****Input {:?} ", row);
     is_all_decreasing(row.to_vec()) | is_all_increasing(row.to_vec())
@@ -37,7 +68,7 @@ pub fn decreasing_rule(n:&i32, n_plus_1: &i32) -> bool {
     ((n- n_plus_1) >0)  & ((n- n_plus_1)<= 3)
 }
 
-pub fn is_all_decreasing(mut level: Vec<i32>) -> bool{
+pub fn is_all_decreasing(level: Vec<i32>) -> bool{
     let re = level.iter()
         .zip(level.iter().skip(1))
         .all(|(a, b)| decreasing_rule(a,b));
@@ -50,7 +81,7 @@ pub fn increasing_rule(n:&i32, n_plus_1: &i32) -> bool {
     ((n_plus_1 -n )>0) & ((n_plus_1 - n)<=3)
 }
 
-pub fn is_all_increasing(mut level: Vec<i32>) -> bool{
+pub fn is_all_increasing(level: Vec<i32>) -> bool{
     let re = level.iter()
         .zip(level.iter().skip(1))
         .all(|(a, b)| increasing_rule(a,b));
@@ -61,6 +92,31 @@ pub fn is_all_increasing(mut level: Vec<i32>) -> bool{
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn is_safe_with_tolerance_should_return_true_removing_any_level_makes_the_report_safe() {
+        // Given
+        let vector = vec![1,3,2,4,5];
+
+        // When
+        let result = is_safe_with_tolerance(vector);
+
+        // Then
+        assert!(result);
+    }
+
+    #[test]
+    fn is_safe_with_tolerance_should_return_true_removing_any_level_makes_the_report_safe_2() {
+        // Given
+        let vector = vec![8,6,4,4,1];
+
+        // When
+        let result = is_safe_with_tolerance(vector);
+
+        // Then
+        assert!(result);
+    }
+    
 
     #[test]
     fn increasing_rule_should_return_false_when_n_is_smaller_than_n_plus_1() {
