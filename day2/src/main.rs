@@ -11,10 +11,10 @@ fn main() {
 pub fn day2_part1_solve(file_path: &str,){
     let rows = read_lines(file_path);
 
-    let count = rows.iter().filter(|&row| is_sage(row.to_vec())).count();
+    let count = rows.iter().filter(|&row| is_safe(row.to_vec())).count();
     println!("The result for part1 file: {} is : {}", file_path, count);
 }
-pub fn is_sage(row: Vec<i32>)-> bool{
+pub fn is_safe(row: Vec<i32>) -> bool{
     // println!("****Input {:?} ", row);
     is_all_decreasing(row.to_vec()) | is_all_increasing(row.to_vec())
 }
