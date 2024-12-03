@@ -25,43 +25,9 @@ fn detect_mul(sequence: &str) -> u32  {
     result.iter().sum()
 }
 
-pub fn apply_mul(mul_command: &String) -> u32 {
-    let re = Regex::new(r"(\d+),(\d+)").unwrap();
-    let mut result: u32= 0;
-    for (_, [left_term, right_term]) in re.captures_iter(mul_command).map(|c| c.extract()) {
-        result = left_term.parse::<u32>().unwrap() * right_term.parse::<u32>().unwrap();
-    }
-
-    result
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn apply_mull_should_returns_the_multiplication_of_a_valid_mul_command() {
-        // Given
-        let command = "mul(2,4)".to_string();
-
-        // When
-        let result = apply_mul(&command);
-
-        // Then
-        assert_eq!(result, 8);
-    }
-
-    #[test]
-    fn apply_mull_should_returns_the_multiplication_of_a_valid_mul_command_with_numbers_of_three_digits() {
-        // Given
-        let command = "mul(824,660)".to_string();
-
-        // When
-        let result = apply_mul(&command);
-
-        // Then
-        assert_eq!(result, 824*660);
-    }
 
     #[test]
     fn detect_mul_should_get_from_string_the_occurrences_of_mul_commands() {
